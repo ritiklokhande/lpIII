@@ -1,0 +1,117 @@
+d2 Huffman
+
+java :
+
+import java.util.*;
+class d2_huf {
+    public static void main(String args[] ) {
+        String str  = "abcdef";
+        int arr[] = {5, 9, 12, 13, 16, 45};
+        System.out.println(huffmanCodes(str, arr, arr.length));
+    }
+    public static ArrayList<String> huffmanCodes(String S, int f[], int N)  // S->Unique Characters, f->frequency of each character, N->total number of unique characters
+    {
+        PriorityQueue<Node> pq = new PriorityQueue<>((a,b)->{
+            if(a.data!=b.data) return a.data-b.data; 
+            return 1; // to maintain the order in which they are given. 
+        });
+        for(int i=0;i<N;i++){
+            pq.add(new Node(f[i],S.charAt(i),null,null));
+        }
+        
+        while(pq.size()>1){
+            Node a = pq.poll();
+            Node b = pq.poll();
+            
+            Node new_node = new Node(a.data+b.data,'_',a,b);
+            pq.add(new_node);
+        }
+        
+        ArrayList<String> ans = new ArrayList<>();
+        preOrder(pq.remove(),"",ans);
+        return ans;
+    }
+    private static void preOrder(Node root,String t,ArrayList<String> ans){
+        if(root==null) return;
+        if(root.left==null && root.right==null){
+            ans.add(t);
+        }
+        preOrder(root.left,t+"0",ans);
+        preOrder(root.right,t+"1",ans);
+    }
+}
+class Node{
+    int data;
+    char c;
+    Node left,right;
+    public Node(int data,char c,Node left,Node right){
+        this.data=data;
+        this.c=c;
+        this.left=left;
+        this.right=right;
+    }
+}
+
+cpp :
+
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Node {
+public:
+    int data;
+    char c;
+    Node* left;
+    Node* right;
+    Node(int data, char c, Node* left = nullptr, Node* right = nullptr)
+        : data(data), c(c), left(left), right(right) {}
+};
+
+class Compare {
+public:
+    bool operator()(Node* a, Node* b) {
+        if(a->data != b->data) return a->data > b->data;
+        return false;
+    }
+};
+
+void preOrder(Node* root, string t, vector<string>& ans) {
+    if (!root) return;
+    if (!root->left && !root->right) {
+        ans.push_back(t);
+    }
+    preOrder(root->left, t + "0", ans);
+    preOrder(root->right, t + "1", ans);
+}
+
+vector<string> huffmanCodes(string S, int f[], int N) {
+    priority_queue<Node*, vector<Node*>, Compare> pq;
+    for (int i = 0; i < N; i++) {
+        pq.push(new Node(f[i], S[i]));
+    }
+    
+    while (pq.size() > 1) {
+        Node* a = pq.top(); pq.pop();
+        Node* b = pq.top(); pq.pop();
+        
+        Node* new_node = new Node(a->data + b->data, '_', a, b);
+        pq.push(new_node);
+    }
+
+    vector<string> ans;
+    preOrder(pq.top(), "", ans);
+    return ans;
+}
+
+int main() {
+    string str = "abcdef";
+    int arr[] = {5, 9, 12, 13, 16, 45};
+    vector<string> result = huffmanCodes(str, arr, sizeof(arr) / sizeof(arr[0]));
+    for (const auto& code : result) {
+        cout << code << endl;
+    }
+    return 0;
+}
